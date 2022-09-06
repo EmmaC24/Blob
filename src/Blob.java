@@ -9,8 +9,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.PrintWriter;
 
@@ -20,11 +23,26 @@ public class Blob {
 	public Blob (String path) throws FileNotFoundException, IOException
 	{
 //		Path path = Paths.get(textPath);
-		fileContents = readFile (path, StandardCharsets.UTF_8);
-		File sha1File = new File ("./objects/" + readAndConvertFileToSHA1 (path, StandardCharsets.UTF_8));
+		fileContents = readFile (path, StandardCharsets.ISO_8859_1);
+		File sha1File = new File ("./objects/" + readAndConvertFileToSHA1 (path, StandardCharsets.ISO_8859_1));
 		PrintWriter printWriter = new PrintWriter (sha1File);
 		printWriter.print(fileContents);
 		printWriter.close();
+		
+		
+////		StringBuilder sb = new StringBuilder();
+////		sb.append("Test String");
+////
+////		File f = new File("d:\\test.zip");
+////		ZipOutputStream out = new ZipOutputStream(new FileOutputStream(f));
+////		ZipEntry e = new ZipEntry("mytext.txt");
+////		out.putNextEntry(e);
+////
+////		byte[] data = sb.toString().getBytes();
+////		out.write(data, 0, data.length);
+////		out.closeEntry();
+//
+//		out.close();
 		// /Users/emmamiller/eclipse-workspace/Blob/objects
 	}
 
@@ -32,7 +50,9 @@ public class Blob {
 	public static String readAndConvertFileToSHA1(String path, Charset encoding) throws IOException
     {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
-        return toSHA1 (encoded);
+        System.out.println ("bytearray" + Files.readAllBytes(Paths.get(path)));
+        System.out.println ("filename" + byteArrayToHexString (encoded));
+        return  byteArrayToHexString (encoded);
     }
 	
 	public static String readFile(String path, Charset encoding) throws IOException
@@ -42,16 +62,16 @@ public class Blob {
     }
 	
 	
-	public static String toSHA1(byte[] convertme) {
-	    MessageDigest md = null;
-	    try {
-	        md = MessageDigest.getInstance("SHA-1");
-	    }
-	    catch(NoSuchAlgorithmException e) {
-	        e.printStackTrace();
-	    } 
-	    return new String(md.digest(convertme));
+	public static String byteArrayToHexString(byte[] b) 
+	{
+		  String result = "";
+		  for (int i=0; i < b.length; i++) {
+		    result +=
+		          Integer.toString( ( b[i] & 0xff ) + 0x100, 16).substring( 1 );
+		  }
+		  return result;
 	}
+
 	
 	
 	
