@@ -34,7 +34,10 @@ public class Index {
 		//System.out.println ("remove check" + objectsDirectory.get(fileName));
 		File toDelete = new File ("./objects/" + objectsDirectory.get (fileName));
 		toDelete.delete();
-		objectsDirectory.remove(fileName);
+		if (objectsDirectory.containsKey(fileName))
+			{
+				objectsDirectory.remove(fileName);
+			}
 		updateIndex();
 		//System.out.println ("hashmap " + objectsDirectory);
 		
