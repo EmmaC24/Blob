@@ -24,11 +24,13 @@ public class Index {
 	
 	public void removeBlob (String fileName)
 	{
-		objectsDirectory.remove(fileName);
-		
-		File toDelete = new File ("/objects/" + objectsDirectory.get (fileName));
+		System.out.println ("remove check" + objectsDirectory.get(fileName));
+		File toDelete = new File ("./objects/" + objectsDirectory.get (fileName));
 		//try removing the dot if it doesn't work
 		toDelete.delete();
+		objectsDirectory.remove(fileName);
+		
+		
 		
 	}
 	
