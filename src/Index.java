@@ -17,14 +17,16 @@ public class Index {
 		Blob blobby = new Blob(fileName);
 		String blobbySHA1 = blobby.getSHA1();
 		objectsDirectory.put(fileName, blobbySHA1);
-		PrintWriter printWriter = new PrintWriter ("index");
-		printWriter.print(fileName + " : " + blobbySHA1);	
+		PrintWriter printWriter = new PrintWriter ("./Test/" + "index");
+		printWriter.print(fileName + " : " + blobbySHA1);
+		printWriter.close();
 	}
 	
 	public void removeBlob (String fileName)
 	{
 		objectsDirectory.remove(fileName);
-		File toDelete = new File ("./objects/" + fileName);
+		
+		File toDelete = new File ("/objects/" + objectsDirectory.get (fileName));
 		//try removing the dot if it doesn't work
 		toDelete.delete();
 		
