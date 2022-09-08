@@ -19,12 +19,14 @@ import java.io.PrintWriter;
 
 public class Blob {
 	private String fileContents;
+	private String sha1;
 	
 	public Blob (String path) throws FileNotFoundException, IOException
 	{
 //		Path path = Paths.get(textPath);
 		fileContents = readFile (path, StandardCharsets.ISO_8859_1);
-		File sha1File = new File ("./objects/" + readAndConvertFileToSHA1 (path, StandardCharsets.ISO_8859_1));
+		sha1 = readAndConvertFileToSHA1 (path, StandardCharsets.ISO_8859_1);
+		File sha1File = new File ("./objects/" + sha1);
 		PrintWriter printWriter = new PrintWriter (sha1File);
 		printWriter.print(fileContents);
 		printWriter.close();
@@ -46,6 +48,10 @@ public class Blob {
 		// /Users/emmamiller/eclipse-workspace/Blob/objects
 	}
 
+	public String getSHA1()
+	{
+		return sha1;
+	}
 	
 	public static String readAndConvertFileToSHA1(String path, Charset encoding) throws IOException
     {
