@@ -23,7 +23,7 @@ public class Blob {
 	
 	public Blob (String path) throws FileNotFoundException, IOException
 	{
-//		Path path = Paths.get(textPath);
+		
 		fileContents = readFile (path, StandardCharsets.ISO_8859_1);
 		sha1 = readAndConvertFileToSHA1 (path, StandardCharsets.ISO_8859_1);
 		File sha1File = new File ("./objects/" + sha1);
