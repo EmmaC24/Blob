@@ -10,7 +10,10 @@ public class IndexTester {
 		first.init();
 		first.addBlob("hello");
 		first.addBlob("goodbye");
-		first.removeBlob("hello");
+		first.addBlob("cookie");
+		//first.removeBlob("hello");
+		first.removeBlob("cookie");
+		//first.removeBlob("goodbye");
 		
 	}
 }

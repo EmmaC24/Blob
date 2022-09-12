@@ -23,9 +23,7 @@ public class Index {
 		Blob blobby = new Blob(fileName);
 		String blobbySHA1 = blobby.getSHA1();
 		objectsDirectory.put(fileName, blobbySHA1);
-		PrintWriter printWriter = new PrintWriter ("./testFile/" + "index");
-		printWriter.print(fileName + " : " + blobbySHA1);
-		printWriter.close();
+		updateIndex();
 	}
 	
 	public void removeBlob (String fileName) throws FileNotFoundException
@@ -50,11 +48,10 @@ public class Index {
 		PrintWriter printWriter2 = new PrintWriter ("./testFile/" + "index");
 		for (String name: objectsDirectory.keySet()) {
 		    String key = name.toString();
-		    String value = objectsDirectory.get(name).toString();
-		    printWriter2.print(key + " : " + value);
+		    String value = objectsDirectory.get(name);
+		    printWriter2.print (key + " : " + value + "\n");
 		}
 		printWriter2.close();
 	}
 	
-	// object directory = hashmap
 }

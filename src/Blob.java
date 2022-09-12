@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Formatter;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import java.io.File;
@@ -30,22 +31,6 @@ public class Blob {
 		PrintWriter printWriter = new PrintWriter (sha1File);
 		printWriter.print(fileContents);
 		printWriter.close();
-		
-		
-////		StringBuilder sb = new StringBuilder();
-////		sb.append("Test String");
-////
-////		File f = new File("d:\\test.zip");
-////		ZipOutputStream out = new ZipOutputStream(new FileOutputStream(f));
-////		ZipEntry e = new ZipEntry("mytext.txt");
-////		out.putNextEntry(e);
-////
-////		byte[] data = sb.toString().getBytes();
-////		out.write(data, 0, data.length);
-////		out.closeEntry();
-//
-//		out.close();
-		// /Users/emmamiller/eclipse-workspace/Blob/objects
 	}
 
 	public String getSHA1()
@@ -56,8 +41,8 @@ public class Blob {
 	public static String readAndConvertFileToSHA1(String path, Charset encoding) throws IOException
     {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
-        System.out.println ("bytearray" + Files.readAllBytes(Paths.get(path)));
-        System.out.println ("filename" + byteArrayToHexString (encoded));
+        //System.out.println ("bytearray" + Files.readAllBytes(Paths.get(path)));
+        //System.out.println ("filename" + byteArrayToHexString (encoded));
         return  byteArrayToHexString (encoded);
     }
 	
@@ -77,8 +62,5 @@ public class Blob {
 		  }
 		  return result;
 	}
-
-	
-	
 	
 }
