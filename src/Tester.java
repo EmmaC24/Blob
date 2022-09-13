@@ -1,7 +1,9 @@
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -9,21 +11,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.junit.jupiter.api.Test;
-//import org.junit.rules.ErrorCollector;
 
 class Tester {
-
-// write methods to write text into file
-//	public ErrorCollector collector  = new ErrorCollector ();
 	
 	@Test
-//	void test() {
-//		
-//		
-//		fail("Not yet implemented");
-//	}
-	
-	// how to make it continue testing even after failing
 	void testBlob () throws FileNotFoundException, IOException {
 		this.writeFile("cookie", "chocolate chip, oatmeal, oreos, and gingersnap");
 		Blob b = new Blob ("./cookie");
@@ -32,6 +23,7 @@ class Tester {
 		assertTrue (b.getSHA1().equals("f43b2dc13be66d493ab6cf99c0c5b24acd744233"));
 	}
 	
+	@Test
 	void testInit () {
 		File index = new File ("./testFile/index");
 		File obj = new File ("./objects");
@@ -51,19 +43,29 @@ class Tester {
 		assertTrue (newIndex.exists());
 	}
 	
+	@Test
 	void testAddAndRemoveBlob () throws FileNotFoundException, IOException {
 		Index obj = new Index ();
 		obj.init();
 		this.writeFile("goodbye", "goodbye!");
 		obj.addBlob ("goodbye");
-		File blob = new File ("./objects");
-//		assertTrue ();//how to check if it has stuff in it?? and that it's the right hash
-		
-		
-		obj.removeBlob("goodbye"); 
-		File goodbye = new File ("./goodbye");
-		assertTrue (!goodbye.exists());
-		// how do we check index without just looking in it manually
+		File blob = new File ("./objects/1019c6b371c727c6b7ac7b855f3822d64d795b1c");
+		String indexContent = this.content("./testFile/index");
+		assertTrue (blob.exists());
+		assertTrue (indexContent.contains("goodbye : 1019c6b371c727c6b7ac7b855f3822d64d795b1"));
+	}
+	
+	@Test
+	void testRemoveBlob () throws IOException {
+		Index obj = new Index ();
+		obj.init ();
+		this.writeFile("hello", "hello!");
+		obj.addBlob("hello");
+		obj.removeBlob("hello"); 
+		String indexContent = this.content("./testFile/index");
+		File blob = new File ("./objects/8f7d88e901a5ad3a05d8cc0de93313fd76028f8c");
+		assertTrue (!blob.exists());
+		assertTrue (!indexContent.contains("hello : 8f7d88e901a5ad3a05d8cc0de93313fd76028f8c"));
 	}
 	
 	
@@ -75,5 +77,18 @@ class Tester {
 	            // TODO Auto-generated catch block
 	            e.printStackTrace();
 	        }
+	}
+	
+	private String content (String filepath) throws IOException {
+		File file = new File (filepath);
+		BufferedReader br = new BufferedReader(new FileReader(file)); 
+		StringBuilder sb = new StringBuilder(); 
+		String line = br.readLine(); 
+		while (line != null) { 
+			sb.append(line).append("\n"); 
+			line = br.readLine(); 
+		} 
+		String fileAsString = sb.toString();
+		return fileAsString;
 	}
 }
