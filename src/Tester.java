@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 class Tester {
 	
 	@Test
-	void testBlob () throws FileNotFoundException, IOException {
+	void testBlobFileLocationName () throws FileNotFoundException, IOException {
 		this.writeFile("cookie", "chocolate chip, oatmeal, oreos, and gingersnap");
 		Blob b = new Blob ("./cookie");
 		File shaFile = new File ("./objects/f43b2dc13be66d493ab6cf99c0c5b24acd744233"); // should we make it case insensitive?
@@ -24,27 +24,24 @@ class Tester {
 	}
 	
 	@Test
+	void testBlobContent () throws IOException {
+		String words = "chocolate chip, oatmeal, oreos, and gingersnap";
+		String content = this.content("./objects/f43b2dc13be66d493ab6cf99c0c5b24acd744233");
+		assertTrue (words.equals(content));
+	}
+	
+	@Test
 	void testInit () {
-		File index = new File ("./testFile/index");
-		File obj = new File ("./objects");
-		index.delete();
-		if (obj.exists()) {
-			File[] contents = obj.listFiles();
-			for (File f : contents) {
-	            f.delete();
-	        }
-		}
-		
 		Index git = new Index ();
 		git.init();
 		File newObjects = new File ("./objects");
-		File newIndex = new File ("./index");
+		File newIndex = new File ("./testFile/index");
 		assertTrue (newObjects.exists());
 		assertTrue (newIndex.exists());
 	}
 	
 	@Test
-	void testAddAndRemoveBlob () throws FileNotFoundException, IOException {
+	void testAddBlob () throws FileNotFoundException, IOException {
 		Index obj = new Index ();
 		obj.init();
 		this.writeFile("goodbye", "goodbye!");
@@ -66,6 +63,23 @@ class Tester {
 		File blob = new File ("./objects/8f7d88e901a5ad3a05d8cc0de93313fd76028f8c");
 		assertTrue (!blob.exists());
 		assertTrue (!indexContent.contains("hello : 8f7d88e901a5ad3a05d8cc0de93313fd76028f8c"));
+	}
+	
+	@Test
+	void testMultipleAdds () throws FileNotFoundException, IOException {
+		Index obj = new Index ();
+		obj.init ();
+		this.writeFile("test1", "This is test 1");
+		this.writeFile ("test2", "This is test 2");
+		this.writeFile("test3", "This is test 3");
+		obj.addBlob("test1");
+		obj.addBlob("test2");
+		obj.addBlob("test3");
+		obj.removeBlob("test1");
+		File removed = new File ("./objects/1fa5bfacc1096a3798801db3bd0ca4fa3bdb2587");
+		assertTrue (!removed.exists());
+		String indexContent = this.content("./testFile/index");
+		assertTrue (!indexContent.contains("test1 : 1fa5bfacc1096a3798801db3bd0ca4fa3bdb2587"));
 	}
 	
 	
