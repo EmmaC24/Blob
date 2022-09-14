@@ -5,44 +5,47 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Tree {
-	private HashMap <String, String> map;
 	private File indexF;
 	private String hash;
 	private String content;
 	
-	public Tree (HashMap <String, String> hashmap) throws IOException, NoSuchAlgorithmException {
-		map = hashmap;
+	public Tree (String [] blobs) throws IOException, NoSuchAlgorithmException {
+		content = this.convertArrayToString(blobs);
 		indexF = new File ("./indexF");
-		this.createIndexFromMap();
+		this.writeFile("indexF", content);
 		hash = this.createHash("./indexF");
-		content = this.content("./indexF");
 		File obj = new File ("./objects");
 		obj.mkdir();
 		this.createsNewFile();
+		indexF.delete();
 	}
 	
-	private void createIndexFromMap () throws IOException {
-		BufferedWriter bf = new BufferedWriter(new FileWriter(indexF));
-
-		// iterate map entries
-		for (Map.Entry<String, String> entry :
-			map.entrySet()) {
-
-			// put key and value separated by a colon
-			bf.write(entry.getKey() + " : "
-					+ entry.getValue());
-
-			// new line
-			bf.newLine();
+	private String convertArrayToString (String [] info) {
+		String str = "";
+		for (int i=0; i<info.length; i++) {
+			str += info[i];
+			str += "\n";
 		}
-		bf.close();
+		return str;
+	}
+	
+	private void writeFile (String fileName, String content) {
+		 Path p = Paths.get(fileName);
+	        try {
+	            Files.writeString(p, content, StandardCharsets.ISO_8859_1);
+	        } catch (IOException e) {
+	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+	        }
 	}
 	
 	private String createHash (String filePath) throws IOException, NoSuchAlgorithmException {

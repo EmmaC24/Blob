@@ -10,21 +10,34 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class Tester {
 	
+	@BeforeAll
+	static void setUp () {
+		Tester.writeFile ("cookie", "chocolate chip, oatmeal, oreos, and gingersnap");
+	}
+	
+	@AfterAll
+	static void tearDown () {
+		File cookie = new File ("cookie");
+		cookie.delete();
+	}
+	
 	@Test
 	void testBlobFileLocationName () throws FileNotFoundException, IOException {
-		this.writeFile("cookie", "chocolate chip, oatmeal, oreos, and gingersnap");
 		Blob b = new Blob ("./cookie");
 		File shaFile = new File ("./objects/f43b2dc13be66d493ab6cf99c0c5b24acd744233"); // should we make it case insensitive?
+		assertTrue (b.getSHA1().equalsIgnoreCase("f43b2dc13be66d493ab6cf99c0c5b24acd744233"));
 		assertTrue (shaFile.exists());
-		assertTrue (b.getSHA1().equals("f43b2dc13be66d493ab6cf99c0c5b24acd744233"));
 	}
 	
 	@Test
 	void testBlobContent () throws IOException {
+		Blob b = new Blob ("./cookie");
 		String words = "chocolate chip, oatmeal, oreos, and gingersnap";
 		String content = this.content("./objects/f43b2dc13be66d493ab6cf99c0c5b24acd744233");
 		assertTrue (words.equals(content));
@@ -44,46 +57,47 @@ class Tester {
 	void testAddBlob () throws FileNotFoundException, IOException {
 		Index obj = new Index ();
 		obj.init();
-		this.writeFile("goodbye", "goodbye!");
-		obj.addBlob ("goodbye");
-		File blob = new File ("./objects/1019c6b371c727c6b7ac7b855f3822d64d795b1c");
+		obj.addBlob ("cookie");
+		File blob = new File ("./objects/f43b2dc13be66d493ab6cf99c0c5b24acd744233");
 		String indexContent = this.content("./testFile/index");
 		assertTrue (blob.exists());
-		assertTrue (indexContent.contains("goodbye : 1019c6b371c727c6b7ac7b855f3822d64d795b1"));
+		assertTrue (indexContent.contains("cookie : f43b2dc13be66d493ab6cf99c0c5b24acd744233"));
 	}
 	
 	@Test
 	void testRemoveBlob () throws IOException {
 		Index obj = new Index ();
 		obj.init ();
-		this.writeFile("hello", "hello!");
-		obj.addBlob("hello");
-		obj.removeBlob("hello"); 
+		obj.addBlob("cookie");
+		obj.removeBlob("cookie"); 
 		String indexContent = this.content("./testFile/index");
-		File blob = new File ("./objects/8f7d88e901a5ad3a05d8cc0de93313fd76028f8c");
+		File blob = new File ("./objects/f43b2dc13be66d493ab6cf99c0c5b24acd744233");
 		assertTrue (!blob.exists());
-		assertTrue (!indexContent.contains("hello : 8f7d88e901a5ad3a05d8cc0de93313fd76028f8c"));
+		assertTrue (!indexContent.contains("cookie : f43b2dc13be66d493ab6cf99c0c5b24acd744233"));
 	}
 	
 	@Test
 	void testMultipleAdds () throws FileNotFoundException, IOException {
 		Index obj = new Index ();
 		obj.init ();
-		this.writeFile("test1", "This is test 1");
-		this.writeFile ("test2", "This is test 2");
-		this.writeFile("test3", "This is test 3");
+		Tester.writeFile("test1", "This is test 1");
+		Tester.writeFile ("test2", "This is test 2");
 		obj.addBlob("test1");
 		obj.addBlob("test2");
-		obj.addBlob("test3");
+		obj.addBlob("cookie");
 		obj.removeBlob("test1");
 		File removed = new File ("./objects/1fa5bfacc1096a3798801db3bd0ca4fa3bdb2587");
 		assertTrue (!removed.exists());
 		String indexContent = this.content("./testFile/index");
 		assertTrue (!indexContent.contains("test1 : 1fa5bfacc1096a3798801db3bd0ca4fa3bdb2587"));
+		File t2 = new File ("test2");
+		t2.delete();
+		File t1 = new File ("test1");
+		t1.delete();
 	}
 	
 	
-	private void writeFile (String fileName, String content) {
+	private static void writeFile (String fileName, String content) {
 		 Path p = Paths.get(fileName);
 	        try {
 	            Files.writeString(p, content, StandardCharsets.ISO_8859_1);
