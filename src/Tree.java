@@ -11,14 +11,15 @@ import java.nio.file.Paths;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 
 public class Tree {
 	private File indexF;
 	private String hash;
 	private String content;
 	
-	public Tree (String [] blobs) throws IOException, NoSuchAlgorithmException {
-		content = this.convertArrayToString(blobs);
+	public Tree (ArrayList <String> blobs) throws IOException, NoSuchAlgorithmException {
+		content = this.convertListToString(blobs);
 		indexF = new File ("./indexF");
 		this.writeFile("indexF", content);
 		hash = this.createHash("./indexF");
@@ -28,10 +29,10 @@ public class Tree {
 		indexF.delete();
 	}
 	
-	private String convertArrayToString (String [] info) {
+	private String convertListToString (ArrayList <String> info) {
 		String str = "";
-		for (int i=0; i<info.length; i++) {
-			str += info[i];
+		for (int i=0; i<info.size(); i++) {
+			str += info.get(i);
 			str += "\n";
 		}
 		return str;
