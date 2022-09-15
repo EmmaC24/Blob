@@ -15,10 +15,18 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class Tester {
+	private static String actualSha;
+	private static String upper;
+	private static File shaFile;
+	private static File upperCase;
 	
 	@BeforeAll
 	static void setUp () {
 		Tester.writeFile ("cookie", "chocolate chip, oatmeal, oreos, and gingersnap");
+		actualSha = "f43b2dc13be66d493ab6cf99c0c5b24acd744233";
+		upper = actualSha.toUpperCase();
+		shaFile = new File ("./objects/"+actualSha);
+		upperCase = new File ("./objects/"+upper);
 	}
 	
 	@AfterAll
@@ -30,17 +38,22 @@ class Tester {
 	@Test
 	void testBlobFileLocationName () throws FileNotFoundException, IOException {
 		Blob b = new Blob ("./cookie");
-		File shaFile = new File ("./objects/f43b2dc13be66d493ab6cf99c0c5b24acd744233"); // should we make it case insensitive?
 		assertTrue (b.getSHA1().equalsIgnoreCase("f43b2dc13be66d493ab6cf99c0c5b24acd744233"));
-		assertTrue (shaFile.exists());
+		assertTrue (shaFile.exists()||upperCase.exists());
 	}
 	
 	@Test
 	void testBlobContent () throws IOException {
 		Blob b = new Blob ("./cookie");
 		String words = "chocolate chip, oatmeal, oreos, and gingersnap";
-		String content = this.content("./objects/f43b2dc13be66d493ab6cf99c0c5b24acd744233");
-		assertTrue (words.equals(content));
+		if (shaFile.exists()) {
+			String content = this.content(shaFile.getCanonicalPath());
+			assertTrue (words.equals(content));
+		}
+		else {
+			String ifUpper = this.content(upperCase.getCanonicalPath());
+			assertTrue (words.equals(ifUpper));
+		}
 	}
 	
 	@Test
@@ -58,10 +71,9 @@ class Tester {
 		Index obj = new Index ();
 		obj.init();
 		obj.addBlob ("cookie");
-		File blob = new File ("./objects/f43b2dc13be66d493ab6cf99c0c5b24acd744233");
 		String indexContent = this.content("./testFile/index");
-		assertTrue (blob.exists());
-		assertTrue (indexContent.contains("cookie : f43b2dc13be66d493ab6cf99c0c5b24acd744233"));
+		assertTrue (shaFile.exists() || upperCase.exists());
+		assertTrue (indexContent.contains("cookie : " + actualSha) || indexContent.contains("cookie : " + upperCase));
 	}
 	
 	@Test
@@ -71,9 +83,8 @@ class Tester {
 		obj.addBlob("cookie");
 		obj.removeBlob("cookie"); 
 		String indexContent = this.content("./testFile/index");
-		File blob = new File ("./objects/f43b2dc13be66d493ab6cf99c0c5b24acd744233");
-		assertTrue (!blob.exists());
-		assertTrue (!indexContent.contains("cookie : f43b2dc13be66d493ab6cf99c0c5b24acd744233"));
+		assertTrue (!shaFile.exists() && !upperCase.exists());
+		assertTrue (!indexContent.contains("cookie : " + actualSha) && !indexContent.contains("cookie : " + upperCase));
 	}
 	
 	@Test
@@ -85,11 +96,25 @@ class Tester {
 		obj.addBlob("test1");
 		obj.addBlob("test2");
 		obj.addBlob("cookie");
-		obj.removeBlob("test1");
-		File removed = new File ("./objects/1fa5bfacc1096a3798801db3bd0ca4fa3bdb2587");
-		assertTrue (!removed.exists());
+		
+		//tests the creation of these three blobs and made it case insensitive; is it efficient? most likely yes. do I know how to fix it? no...
+		File test1 = new File ("./objects/1fa5bfacc1096a3798801db3bd0ca4fa3bdb2587");
+		String upperCase1 = "1fa5bfacc1096a3798801db3bd0ca4fa3bdb2587".toUpperCase();
+		File upper1 = new File ("./objects/" + upperCase1);
+		assertTrue (test1.exists()||upper1.exists());
+		File test2 = new File ("./objects/0e0a7ceb2dc997ac932d99723abc7695c6586255");
+		String upperCase2 = "0e0a7ceb2dc997ac932d99723abc7695c6586255".toUpperCase();
+		File upper2 = new File ("./objects/" + upperCase2);
+		assertTrue (test2.exists()||upper2.exists());
+		assertTrue (shaFile.exists()||upperCase.exists());
 		String indexContent = this.content("./testFile/index");
-		assertTrue (!indexContent.contains("test1 : 1fa5bfacc1096a3798801db3bd0ca4fa3bdb2587"));
+		assertTrue ((indexContent.contains("test1 : 1fa5bfacc1096a3798801db3bd0ca4fa3bdb2587") || indexContent.contains("test1 : " + upperCase1)) && (indexContent.contains("test2 : 0e0a7ceb2dc997ac932d99723abc7695c6586255") || indexContent.contains("test2 : " + upperCase2)) && (indexContent.contains("cookies : " + actualSha) || indexContent.contains("test1 : " + upperCase1)));
+		
+		//checks removeBlob -- does not execute because above tests failed
+		obj.removeBlob("cookie");
+		assertTrue (!shaFile.exists() && !upperCase.exists());
+		indexContent = this.content("./testFile/index");
+		assertTrue (!indexContent.contains("cookie : " + actualSha) && !indexContent.contains("cookie : " + upperCase));
 		File t2 = new File ("test2");
 		t2.delete();
 		File t1 = new File ("test1");
