@@ -2,6 +2,7 @@
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -26,7 +27,8 @@ public class Blob {
 	{
 		
 		fileContents = readFile (path, StandardCharsets.ISO_8859_1);
-		sha1 = readAndConvertFileToSHA1 (path, StandardCharsets.ISO_8859_1);
+		sha1 = encryptThisString (readFile (path, StandardCharsets.ISO_8859_1));
+		//sha1 = readAndConvertFileToSHA1 (path, StandardCharsets.ISO_8859_1);
 		File sha1File = new File ("./objects/" + sha1);
 		PrintWriter printWriter = new PrintWriter (sha1File);
 		printWriter.print(fileContents);
@@ -38,13 +40,13 @@ public class Blob {
 		return sha1;
 	}
 	
-	public static String readAndConvertFileToSHA1(String path, Charset encoding) throws IOException
-    {
-        byte[] encoded = Files.readAllBytes(Paths.get(path));
-        //System.out.println ("bytearray" + Files.readAllBytes(Paths.get(path)));
-        //System.out.println ("filename" + byteArrayToHexString (encoded));
-        return  byteArrayToHexString (encoded);
-    }
+//	public static String readAndConvertFileToSHA1(String path, Charset encoding) throws IOException
+//    {
+//        byte[] encoded = Files.readAllBytes(Paths.get(path));
+//        //System.out.println ("bytearray" + Files.readAllBytes(Paths.get(path)));
+//        //System.out.println ("filename" + byteArrayToHexString (encoded));
+//        return  byteArrayToHexString (encoded);
+//    }
 	
 	public static String readFile(String path, Charset encoding) throws IOException
     {
@@ -52,15 +54,43 @@ public class Blob {
         return new String(encoded, encoding);
     }
 	
-	
-	public static String byteArrayToHexString(byte[] b) 
-	{
-		  String result = "";
-		  for (int i=0; i < b.length; i++) {
-		    result +=
-		          Integer.toString( ( b[i] & 0xff ) + 0x100, 16).substring( 1 );
-		  }
-		  return result;
-	}
+	public static String encryptThisString(String input)
+    {
+        try {
+            // getInstance() method is called with algorithm SHA-1
+            MessageDigest md = MessageDigest.getInstance("SHA-1");
+ 
+            // digest() method is called
+            // to calculate message digest of the input string
+            // returned as array of byte
+            byte[] messageDigest = md.digest(input.getBytes());
+ 
+            // Convert byte array into signum representation
+            BigInteger no = new BigInteger(1, messageDigest);
+ 
+            // Convert message digest into hex value
+            String hashtext = no.toString(16);
+ 
+            // Add preceding 0s to make it 32 bit
+            while (hashtext.length() < 32) {
+                hashtext = "0" + hashtext;
+            }
+ 
+            // return the HashText
+            return hashtext;
+        }
+        catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+//	public static String byteArrayToHexString(byte[] b) 
+//	{
+//		  String result = "";
+//		  for (int i=0; i < b.length; i++) {
+//		    result +=
+//		          Integer.toString( ( b[i] & 0xff ) + 0x100, 16).substring( 1 );
+//		  }
+//		  return result;
+//	}
 	
 }
