@@ -26,14 +26,14 @@ public class Commit {
 	public Commit (String tree, String sum, String auth, Commit par)
 	{
 		
-		//create the objects folder
+		//do we need to create the objects folder?
 		pTree = tree;
 		summary = sum;
 		author = auth;
 		parent = par;
+		date = getDate();
 		fileLocation = getLocation();
-		
-		
+		createFile();
 		
 	}
 	
@@ -44,7 +44,8 @@ public class Commit {
 	
 	public String getLocation()
 	{
-		return generateSHA1(getFileContents());
+		String loc = "objects/" + generateSHA1(getFileContents());
+		return loc;
 	}
 	
 	public String getFileContents()
@@ -68,6 +69,10 @@ public class Commit {
 		{
 			contents += "\n";
 		}
+		contents += author + "\n";
+		contents += date + "\n";
+		contents += summary;
+		
 		return contents;
 	}
 	
@@ -84,8 +89,8 @@ public class Commit {
 	{
 		DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 		Calendar cal = Calendar.getInstance();
-		date = dateFormat.format(cal.getTime());
-		return date;
+		String d = dateFormat.format(cal.getTime());
+		return d;
 	}
 	public String generateSHA1 (String input)
 	{
