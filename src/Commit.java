@@ -1,40 +1,120 @@
+import java.io.IOException;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.sql.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.LinkedList;
 
 public class Commit {
 	
-	public Commit (String summary, String author, String date)
+	private String author = "";
+	private Commit parent = null;
+	private Commit next = null;
+	//can we always assume that this is null?
+	private String fileLocation = "";
+	public String pTree = "";
+	public String date = "";
+	public String summary = "";
+	//private LinkedList<Commit> list;
+	public Commit (String tree, String sum, String auth, Commit par)
 	{
 		
+		//create the objects folder
+		pTree = tree;
+		summary = sum;
+		author = auth;
+		parent = par;
+		fileLocation = getLocation();
+		
+		
+		
 	}
-//	A Commit is primarily a node of a doubly linked list
-//	A commit has a pointer to one other commit
-//	A commit has a pointer to its parent
-//	The pointers are initially NULL
-//	A Commit also has a variable called 'pTree'
-//	pTree will be null or will point to a Filename or Path or String of a SHA1 file inside the objects folder
-//	pTree is initialized in the constructor
-//	A Commit also has member variables
-//	String called 'summary'
-//	String called 'author'
-//	String called 'date'
-//	A commit has a constructor which takes in three Strings, and a pointer to a parent Commit
-//	The first String is used to assign your pTree variable a value
-//	The second String is a summary of recent changes
-//	The third String is a author
-//	A commit contains a method to generate a SHA1 String
-//	The inputs for the SHA1 are a combination of the 
-//	Has a method to creates a SHA1 String given..
-//	String value of the Filename or Path or String of pTree
-//	And the Summary String
-//	Has a method getDate()
-//	It gets the date as a String in whatever format you like
-//	Has a method which writes out a file
-//	With file contens: 
-//	The file contents are the pTree value on the first line
-//	2nd line is the file location
-//	2nd line is the author
-//	3rd line is the date
-//	4th line is the Summary
-//	The file will be written to in a folder named 'objects'
-//	The file name will be a SHA1 generated as described in #6
+	
+	public String getTree()
+	{
+		return pTree;
+	}
+	
+	public String getLocation()
+	{
+		return generateSHA1(getFileContents());
+	}
+	
+	public String getFileContents()
+	{
+		String contents = "";
+		contents += pTree + "\n";
+		if (parent != null)
+		{
+			contents += parent.getLocation();
+		}
+		else
+		{
+			contents += "\n";
+		}
+		
+		if (next != null)
+		{
+			contents += next.getLocation();
+		}
+		else
+		{
+			contents += "\n";
+		}
+		return contents;
+	}
+	
+	public void createFile()
+	{
+		Path p = Paths.get("objects/" + generateSHA1 (getFileContents()));
+        try {
+            Files.writeString(p, getFileContents(), StandardCharsets.ISO_8859_1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+	}
+	public String getDate ()
+	{
+		DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+		Calendar cal = Calendar.getInstance();
+		date = dateFormat.format(cal.getTime());
+		return date;
+	}
+	public String generateSHA1 (String input)
+	{
+		try {
+            // getInstance() method is called with algorithm SHA-1
+            MessageDigest md = MessageDigest.getInstance("SHA-1");
+ 
+            // digest() method is called
+            // to calculate message digest of the input string
+            // returned as array of byte
+            byte[] messageDigest = md.digest(input.getBytes());
+ 
+            // Convert byte array into signum representation
+            BigInteger no = new BigInteger(1, messageDigest);
+ 
+            // Convert message digest into hex value
+            String hashtext = no.toString(16);
+ 
+            // Add preceding 0s to make it 32 bit
+            while (hashtext.length() < 32) {
+                hashtext = "0" + hashtext;
+            }
+ 
+            // return the HashText
+            return hashtext;
+        }
+        catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+	}
 
 }

@@ -31,8 +31,8 @@ class Tester {
 	
 	@AfterAll
 	static void tearDown () {
-		File cookie = new File ("cookie");
-		cookie.delete();
+//		File cookie = new File ("cookie");
+//		cookie.delete();
 	}
 	
 	@Test
