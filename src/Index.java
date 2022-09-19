@@ -2,6 +2,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 
 public class Index {
@@ -15,7 +19,12 @@ public class Index {
 	{
 		new File("./testFile").mkdir();
 		new File("./objects").mkdir();
-		File emptyFile = new File ("index");
+		Path p = Paths.get("./testFile/" + "index");
+        try {
+            Files.writeString(p, "", StandardCharsets.ISO_8859_1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 	}
 	
 	public void addBlob(String fileName) throws FileNotFoundException, IOException
