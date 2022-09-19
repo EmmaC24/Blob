@@ -1,4 +1,9 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -15,15 +20,15 @@ import java.util.LinkedList;
 public class Commit {
 	
 	private String author = "";
-	private Commit parent = null;
-	private Commit next = null;
+	private String parent = null;
+	private String next = null;
 	//can we always assume that this is null?
 	private String fileLocation = "";
 	public String pTree = "";
 	public String date = "";
 	public String summary = "";
 	//private LinkedList<Commit> list;
-	public Commit (String tree, String sum, String auth, Commit par)
+	public Commit (String tree, String sum, String auth, String par)
 	{
 		
 		//do we need to create the objects folder?
@@ -32,9 +37,32 @@ public class Commit {
 		author = auth;
 		parent = par;
 		date = getDate();
-		fileLocation = getLocation();
+		//fileLocation = getLocation();
 		createFile();
 		
+		
+	}
+	
+	public void updateParent(String p) throws IOException
+	{
+		String parentContents = "";
+		if (!parent.equals(""))
+		{
+			BufferedReader buffy = new BufferedReader (new FileReader ("objects/" + p));
+			parentContents += buffy.readLine() + "\n";
+			parentContents += buffy.readLine() + "\n";
+			parentContents += generateSHA1 (getFileContents()) + "\n";
+			buffy.readLine();
+			parentContents += buffy.readLine() + "\n";
+			parentContents += buffy.readLine() + "\n";
+			parentContents += buffy.readLine();
+			
+			File newParent = new File ("objects/" + p);
+			
+			PrintWriter pw = new PrintWriter (newParent);
+			pw.print(parentContents);
+			pw.close();
+		}
 	}
 	
 	public String getTree()
@@ -42,28 +70,28 @@ public class Commit {
 		return pTree;
 	}
 	
-	public String getLocation()
-	{
-		String loc = "objects/" + generateSHA1(getFileContents());
-		return loc;
-	}
+//	public String getLocation()
+//	{
+//		String loc = "objects/" + generateSHA1(getFileContents());
+//		return loc;
+//	}
 	
 	public String getFileContents()
 	{
 		String contents = "";
 		contents += pTree + "\n";
-		if (parent != null)
+		if (!parent.equals (""))
 		{
-			contents += parent.getLocation()+ "\n";
+			contents += "objects/" + parent + "\n";
 		}
 		else
 		{
 			contents += "\n";
 		}
 		
-		if (next != null)
+		if (!next.equals(""))
 		{
-			contents += next.getLocation()+ "\n";
+			contents += "objects/" + next + "\n";
 		}
 		else
 		{
