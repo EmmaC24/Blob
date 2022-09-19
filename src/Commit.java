@@ -54,7 +54,7 @@ public class Commit {
 		contents += pTree + "\n";
 		if (parent != null)
 		{
-			contents += parent.getLocation();
+			contents += parent.getLocation()+ "\n";
 		}
 		else
 		{
@@ -63,7 +63,7 @@ public class Commit {
 		
 		if (next != null)
 		{
-			contents += next.getLocation();
+			contents += next.getLocation()+ "\n";
 		}
 		else
 		{
